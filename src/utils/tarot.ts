@@ -1,4 +1,5 @@
-import { FUSION_TABLE } from "@/constant/tarot";
+import { ARCANA_LIST, FUSION_TABLE } from "@/constant/tarot";
+import { FusionPath, FusionStep } from "@/types/tarot";
 
 /**
  * 得到type1和type2的合成结果
@@ -6,19 +7,6 @@ import { FUSION_TABLE } from "@/constant/tarot";
 export function getFusionResult(type1: number, type2: number): number {
   const key = type1 < type2 ? `${type1},${type2}` : `${type2},${type1}`;
   return FUSION_TABLE.get(key) ?? -1;
-}
-
-// ...existing code...
-
-interface FusionStep {
-  material1: number;
-  material2: number;
-  result: number;
-}
-
-interface FusionPath {
-  steps: FusionStep[];
-  extraMaterials: number[];
 }
 
 /**
@@ -32,113 +20,105 @@ export function findFusionPaths(
   target: number
 ): FusionPath[] {
   const results: FusionPath[] = [];
-  const maxExtraMaterials = 4;
-  const visited = new Set<string>();
+  const tried = new Set<string>();
 
-  // 验证初始条件
-  if (materials.length < 2 || materials.length > 6) {
-    return [];
-  }
+  // 辅助函数: 检查路径是否已尝试过
+  const isTriedPath = (path: FusionStep[]) => {
+    const key = path.map((p) => `${p.material1},${p.material2}`).join("|");
+    if (tried.has(key)) return true;
+    tried.add(key);
+    return false;
+  };
 
-  function backtrack(
-    current: number[], // 当前可用的素材
-    unused: number[], // 未使用的基础素材
-    path: FusionStep[], // 当前合成路径
-    extras: number[], // 额外添加的素材
-    depth: number // 递归深度防止无限递归
-  ) {
-    // 剪枝条件
-    if (extras.length > maxExtraMaterials || depth > 10) {
-      return;
-    }
+  // 辅助函数: 统计额外需要的素材
+  const getExtraMaterials = (path: FusionStep[], baseMaterials: number[]) => {
+    const used = new Map<number, number>(); // 记录每种素材使用次数
 
-    // 生成当前状态的唯一标识，用于防止重复搜索
-    const stateKey = `${current.sort().join(",")}|${unused.sort().join(",")}`;
-    if (visited.has(stateKey)) {
-      return;
-    }
-    visited.add(stateKey);
+    // 统计基础素材数量
+    baseMaterials.forEach((m) => {
+      used.set(m, (used.get(m) || 0) + 1);
+    });
 
-    // 检查是否达到目标
-    if (current.length === 1 && current[0] === target && unused.length === 0) {
-      results.push({
-        steps: [...path],
-        extraMaterials: [...extras],
-      });
-      return;
-    }
+    // 统计路径中使用的素材
+    path.forEach((step) => {
+      used.set(step.material1, (used.get(step.material1) || 0) - 1);
+      used.set(step.material2, (used.get(step.material2) || 0) - 1);
+    });
 
-    // 1. 优先尝试合成已有素材
-    for (let i = 0; i < current.length; i++) {
-      for (let j = i + 1; j < current.length; j++) {
-        const result = getFusionResult(current[i], current[j]);
-        if (result !== -1) {
-          const newCurrent = [
-            ...current.slice(0, i),
-            ...current.slice(i + 1, j),
-            ...current.slice(j + 1),
-            result,
-          ];
-
-          backtrack(
-            newCurrent,
-            unused,
-            [...path, { material1: current[i], material2: current[j], result }],
-            extras,
-            depth + 1
-          );
+    // 收集额外需要的素材
+    const extras: number[] = [];
+    used.forEach((count, type) => {
+      if (count < 0) {
+        for (let i = 0; i < Math.abs(count); i++) {
+          extras.push(type);
         }
+      }
+    });
+
+    return extras;
+  };
+
+  const tryFusion = (
+    currentMaterials: number[],
+    path: FusionStep[],
+    baseMaterials: number[]
+  ) => {
+    // 基本条件检查
+    if (path.length > 5) return; // 限制合成步骤
+    if (results.length >= 5) return; // 限制结果数量
+
+    // 检查是否需要额外素材超过限制
+    const extras = getExtraMaterials(path, baseMaterials);
+    if (extras.length > 3) return;
+
+    // 尝试两两合成
+    for (let i = 0; i < currentMaterials.length; i++) {
+      for (let j = i + 1; j < currentMaterials.length; j++) {
+        const mat1 = currentMaterials[i];
+        const mat2 = currentMaterials[j];
+        const result = getFusionResult(mat1, mat2);
+
+        if (result === -1) continue;
+
+        const newPath = [...path, { material1: mat1, material2: mat2, result }];
+        if (isTriedPath(newPath)) continue;
+
+        // 如果达到目标
+        if (result === target) {
+          const extraMaterials = getExtraMaterials(newPath, baseMaterials);
+          if (extraMaterials.length <= 3) {
+            results.push({ steps: newPath, extraMaterials });
+          }
+          return;
+        }
+
+        // 继续尝试剩余材料
+        const remainingMaterials = [
+          ...currentMaterials.slice(0, i),
+          ...currentMaterials.slice(i + 1, j),
+          ...currentMaterials.slice(j + 1),
+          result,
+        ];
+        tryFusion(remainingMaterials, newPath, baseMaterials);
       }
     }
 
-    // 2. 如果还有未使用的基础素材，尝试加入
-    if (unused.length > 0) {
-      const material = unused[0];
-      const newUnused = unused.slice(1);
-      backtrack([...current, material], newUnused, path, extras, depth + 1);
-    }
-
-    // 3. 尝试添加一个额外素材（当其他方法都尝试过后）
-    if (extras.length < maxExtraMaterials) {
-      for (let type = 0; type < 23; type++) {
-        if (
-          !extras.includes(type) &&
-          !current.includes(type) &&
-          !unused.includes(type)
-        ) {
-          backtrack(
-            [...current, type],
-            unused,
-            path,
-            [...extras, type],
-            depth + 1
-          );
-        }
+    // 如果当前材料不够,尝试添加新素材
+    if (currentMaterials.length < 2) {
+      for (const arcana of ARCANA_LIST) {
+        const newMat = arcana.type;
+        if (extras.length >= 3) break; // 已经需要3个额外素材了
+        tryFusion([...currentMaterials, newMat], path, baseMaterials);
       }
     }
-  }
+  };
 
   // 开始搜索
-  backtrack([], [...materials], [], [], 0);
-
-  // 按额外素材数量排序并限制返回数量
-  return results
-    .sort((a, b) => a.extraMaterials.length - b.extraMaterials.length)
-    .slice(0, 5);
+  tryFusion([...materials], [], materials);
+  return results;
 }
 
-/**
- * 格式化合成路径为可读字符串
- */
-export function formatFusionPath(path: FusionPath): string {
-  const { steps, extraMaterials } = path;
-  let result = `需要额外素材: ${extraMaterials.join(", ")}\n合成步骤:\n`;
-
-  steps.forEach((step, index) => {
-    result += `${index + 1}. ${step.material1} + ${step.material2} = ${
-      step.result
-    }\n`;
-  });
-
-  return result;
+export function getArcanaName(type: number): string {
+  const arcana = ARCANA_LIST.find((item) => item.type === type);
+  return arcana ? arcana.name : "未知";
 }
