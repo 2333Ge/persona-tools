@@ -42,7 +42,7 @@ export function findFusionPaths(
     usedMaterials: Set<number>
   ): void => {
     // 剪枝条件
-    if (results.length >= 5 || currentSteps.length > 5) return;
+    if (results.length >= 10 || currentSteps.length > 10) return;
 
     // 检查当前路径是否重复
     if (isTriedPath(currentSteps)) return;

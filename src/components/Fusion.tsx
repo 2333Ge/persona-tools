@@ -5,14 +5,18 @@ import { Button, Select, Card, Empty } from "antd";
 import { ARCANA_LIST } from "@/constant/tarot";
 import { findFusionPaths, getArcanaName } from "@/utils/tarot";
 import { FusionPath } from "@/types/tarot";
+import { cn } from "@/utils/style";
 
-export default function Home() {
+type FusionProps = {
+  className?: string;
+};
+
+export default function Fusion({ className }: FusionProps) {
   const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
   const [targetType, setTargetType] = useState<number>();
   const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
 
-  const isNotChoose =
-    targetType === undefined || selectedMaterials.length === 0;
+  const isNotChoose = targetType === undefined || selectedMaterials.length < 1;
 
   const handleConfirm = () => {
     if (isNotChoose) return;
@@ -22,11 +26,16 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div
+      className={cn(
+        "flex flex-col gap-8 max-w-2xl px-4 w-full py-4",
+        className
+      )}
+    >
       <Card title="二体处刑（合成）计算器" className="w-full">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label>选择基础素材（2-6个）：</label>
+            <label>选择基础素材（1-6个）：</label>
             <Select
               mode="multiple"
               placeholder="请选择基础素材"
@@ -102,6 +111,6 @@ export default function Home() {
           <Empty description="暂无合成路径" />
         )}
       </Card>
-    </>
+    </div>
   );
 }

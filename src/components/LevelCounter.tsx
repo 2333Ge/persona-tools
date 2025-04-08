@@ -6,8 +6,13 @@ import { ARCANA_LIST, SPECIAL_ARCANA_LIST } from "@/constant/tarot";
 import { findLevelCombinations } from "@/utils/level";
 import { LevelResult } from "@/types/tarot";
 import { ColumnsType } from "antd/es/table";
+import { cn } from "@/utils/style";
 
-export default function Home() {
+type LevelProps = {
+  className?: string;
+};
+
+export default function Level({ className }: LevelProps) {
   // 升降级工具的状态
   const [currentArcana, setCurrentArcana] = useState<number>();
   const [isUpgrade, setIsUpgrade] = useState<boolean>(true);
@@ -27,7 +32,7 @@ export default function Home() {
       width: 80,
     },
     {
-      title: "特殊材料",
+      title: "宝魔",
       dataIndex: "specialArcana",
       key: "specialArcana",
       render: (value) =>
@@ -47,7 +52,12 @@ export default function Home() {
   ];
 
   return (
-    <>
+    <div
+      className={cn(
+        "flex flex-col gap-8 max-w-2xl px-4 w-full py-4",
+        className
+      )}
+    >
       <Card title="宝魔升降级计算器" className="w-full">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
@@ -87,7 +97,7 @@ export default function Home() {
         </div>
       </Card>
 
-      <Card title="升降级方案" className="w-full">
+      <Card title="宝魔升降级方案" className="w-full">
         {levelResults.length > 0 ? (
           <Table
             columns={columns}
@@ -100,6 +110,6 @@ export default function Home() {
           <Empty description="暂无升降级方案" />
         )}
       </Card>
-    </>
+    </div>
   );
 }

@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 女神异闻录5工具
 
-## Getting Started
+## 功能说明
 
-First, run the development server:
+- [女神异闻录5工具](#女神异闻录5工具)
+  - [功能说明](#功能说明)
+  - [二体处刑（合成）计算](#二体处刑合成计算)
+  - [宝魔升降级计算](#宝魔升降级计算)
+  - [参考资料](#参考资料)
+  - [其他可用资料](#其他可用资料)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 二体处刑（合成）计算
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 宝魔升降级计算
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 参考资料
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- [P5合成范式](https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F)
 
-## Learn More
+## 其他可用资料
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [P5技能列表](https://wiki.biligame.com/persona/P5R%E6%8A%80%E8%83%BD%E5%88%97%E8%A1%A8)
+- [面具合成与宝魔升降法](https://www.bilibili.com/opus/722047078518226960)
