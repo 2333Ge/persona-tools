@@ -24,89 +24,95 @@ export function findFusionPaths(
   materials: number[],
   target: number
 ): FusionPath[] {
-  let materialsPaths: number[][][] = [];
-  let path: number[][] = [];
+  const results: FusionPath[] = [];
+  const tried = new Set<string>();
 
-  // 第一步，合成到只剩一个结果
-  const dfs = (rest: number[]) => {
+  // 检查路径是否已尝试过
+  const isTriedPath = (steps: FusionStep[]): boolean => {
+    const key = steps.map((s) => `${s.material1},${s.material2}`).join("|");
+    if (tried.has(key)) return true;
+    tried.add(key);
+    return false;
+  };
+
+  // 递归搜索合成路径
+  const dfs = (
+    rest: number[],
+    currentSteps: FusionStep[],
+    usedMaterials: Set<number>
+  ): void => {
+    // 剪枝条件
+    if (results.length >= 5 || currentSteps.length > 5) return;
+
+    // 检查当前路径是否重复
+    if (isTriedPath(currentSteps)) return;
+
+    // 如果当前只剩一个结果,检查是否需要额外材料
     if (rest.length === 1) {
-      materialsPaths.push([...path]);
+      const lastResult = rest[0];
+      if (lastResult === target) {
+        // 找到一个有效路径
+        results.push({
+          steps: currentSteps,
+          extraMaterials: Array.from(usedMaterials),
+        });
+      } else {
+        // 尝试用一个额外材料达到目标
+        const possibleExtras = ARCANA_LIST.map((arcana) => arcana.type).filter(
+          (type) =>
+            !usedMaterials.has(type) &&
+            getFusionResult(type, lastResult) === target
+        );
+
+        for (const extra of possibleExtras) {
+          if (usedMaterials.size >= 3) break; // 限制额外材料数量
+
+          const finalStep: FusionStep = {
+            material1: lastResult,
+            material2: extra,
+            result: target,
+          };
+
+          results.push({
+            steps: [...currentSteps, finalStep],
+            extraMaterials: [...Array.from(usedMaterials), extra],
+          });
+        }
+      }
       return;
     }
 
+    // 尝试两两合成
     for (let i = 0; i < rest.length - 1; i++) {
       for (let j = i + 1; j < rest.length; j++) {
         const type1 = rest[i];
         const type2 = rest[j];
         const result = getFusionResult(type1, type2);
-        path.push([type1, type2]);
 
-        const newRest = rest.filter((_, index) => index !== i && index !== j);
-        newRest.push(result);
-        dfs(newRest);
-        path.pop(); // 回溯，移除最后一步
+        if (result === -1) continue; // 无效合成
+
+        const newStep: FusionStep = {
+          material1: type1,
+          material2: type2,
+          result,
+        };
+
+        // 准备下一轮递归的材料列表
+        const newRest = [
+          ...rest.filter((item) => item !== type1 && item !== type2),
+          result,
+        ];
+
+        dfs(newRest, [...currentSteps, newStep], usedMaterials);
       }
     }
   };
 
-  dfs(materials);
-
-  console.log("materialsPaths====>", materialsPaths);
-
-  const middleFusionResult: FusionPath[] = [];
-  // 将结果转换为FusionStep格式
-  for (let i = 0; i < materialsPaths.length; i++) {
-    const path = materialsPaths[i];
-    const fusionSteps: FusionStep[] = path.map((step) => {
-      const type1 = step[0];
-      const type2 = step[1];
-      const result = getFusionResult(type1, type2);
-      return { material1: type1, material2: type2, result };
-    });
-    middleFusionResult.push({ steps: fusionSteps, extraMaterials: [] });
-  }
-
-  console.log("middleFusionResult====>", middleFusionResult);
-
-  const finalFusionResult: FusionPath[] = [];
-
-  // 第二步，合成到目标结果
-  for (let i = 0; i < middleFusionResult.length; i++) {
-    const path = middleFusionResult[i];
-    const lastResult = path.steps[path.steps.length - 1].result;
-    console.log("getLast====>", getArcanaName(lastResult));
-    if (lastResult !== target) {
-      // 如果最后一步的结果不是目标结果，则利用当前的结果继续合成，额外材料可从所有塔罗牌中任意选取
-
-      const extraMaterials = ARCANA_LIST.map((arcana) => arcana.type).filter(
-        (type) => getFusionResult(type, lastResult) === target
-      );
-
-      if (extraMaterials.length) {
-        console.log("extraMaterials====>", extraMaterials);
-      }
-
-      finalFusionResult.push(
-        ...extraMaterials.map((extraMaterial) => {
-          return {
-            steps: [
-              ...path.steps,
-              {
-                material1: lastResult,
-                material2: extraMaterial,
-                result: target,
-              },
-            ],
-            extraMaterials: [extraMaterial],
-          } satisfies FusionPath;
-        })
-      );
-    } else {
-      finalFusionResult.push(path);
-    }
-  }
-
-  return finalFusionResult;
+  // 开始搜索
+  dfs(materials, [], new Set());
+  return results.sort(
+    (a, b) => a.extraMaterials.length - b.extraMaterials.length
+  );
 }
 
 export function getArcanaName(type: number): string {

@@ -14,3 +14,9 @@ export interface FusionPath {
   steps: FusionStep[];
   extraMaterials: number[];
 }
+
+
+export interface LevelResult {
+  specialArcana: number;  // 特殊arcana的type
+  levelChange: number;    // 升降级数值
+}
