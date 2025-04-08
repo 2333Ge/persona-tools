@@ -5,8 +5,13 @@ import { FusionPath, FusionStep } from "@/types/tarot";
  * 得到type1和type2的合成结果
  */
 export function getFusionResult(type1: number, type2: number): number {
-  const key = type1 < type2 ? `${type1},${type2}` : `${type2},${type1}`;
-  return FUSION_TABLE.get(key) ?? -1;
+  const rowIndex = FUSION_TABLE[0].indexOf(type1);
+  const colIndex = FUSION_TABLE.map((row) => row[0]).indexOf(type2);
+  if (rowIndex === -1 || colIndex === -1) {
+    throw new Error("Invalid type");
+  }
+  const key = FUSION_TABLE[rowIndex][colIndex];
+  return key;
 }
 
 /**
@@ -69,6 +74,7 @@ export function findFusionPaths(
   for (let i = 0; i < middleFusionResult.length; i++) {
     const path = middleFusionResult[i];
     const lastResult = path.steps[path.steps.length - 1].result;
+    console.log("getLast====>", getArcanaName(lastResult));
     if (lastResult !== target) {
       // 如果最后一步的结果不是目标结果，则利用当前的结果继续合成，额外材料可从所有塔罗牌中任意选取
 

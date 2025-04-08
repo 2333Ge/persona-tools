@@ -24,7 +24,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="flex flex-col gap-8 max-w-2xl px-4 w-full">
-        <Card title="塔罗牌合成计算器" className="w-full">
+        <Card title="二体处刑（合成）计算器" className="w-full">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label>选择基础素材（2-6个）：</label>
