@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "./bin/deploy.sh",
+    "deploy:win": ".\\bin\\deploy.cmd"
+
   },
   "dependencies": {
     "antd": "^5.24.6",
