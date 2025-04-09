@@ -1,5 +1,6 @@
 import { ARCANA_LIST, FUSION_TABLE } from "@/constant/tarot";
 import { FusionPath, FusionStep } from "@/types/tarot";
+import { randomSelect } from "./data-handle";
 
 /**
  * 得到type1和type2的合成结果
@@ -76,10 +77,10 @@ export function findFusionPaths(
     currentSteps: FusionStep[],
     usedMaterials: Set<number>
   ): void => {
-    const possibleExtras = findPossibleIndirectMaterials(
-      lastResult,
-      target
-    ).slice(0, MAX_RANDOM_EXTRAS);
+    const possibleExtras = randomSelect(
+      findPossibleIndirectMaterials(lastResult, target),
+      MAX_RANDOM_EXTRAS
+    );
 
     for (const extra of possibleExtras) {
       const intermediateResult = getFusionResult(lastResult, extra);
