@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-cn">
-      <body className={cn(inter.className, "relative")}>
+      <main className={cn(inter.className, "relative")}>
         <div className="w-1/2 md:w-80 fixed right-4 bottom-4 z-[-1] flex flex-col gap-4 items-center justify-center opacity-30">
           <img
             src="/images/p5-1.png"
@@ -31,7 +31,7 @@ export default function RootLayout({
           />
         </div>
         {children}
-      </body>
+      </main>
     </html>
   );
 }
