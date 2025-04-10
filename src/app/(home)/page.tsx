@@ -1,6 +1,6 @@
 "use client";
 
-import Fusion from "@/components/fusion";
+import Fusion from "@/components/fusion-tools";
 import LevelCounter from "@/components/level-counter";
 
 export default function Home() {
