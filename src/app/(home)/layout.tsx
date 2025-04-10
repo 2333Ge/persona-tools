@@ -1,6 +1,6 @@
 "use client";
 
-// import FloatMenuButton from "@/components/float-button";
+import FloatMenuButton from "@/components/float-button";
 import { ConfigProvider, theme } from "antd";
 import { useEffect, useState } from "react";
 
@@ -26,10 +26,16 @@ export default function RootLayout({
     <ConfigProvider
       theme={{
         algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: {
+          // 金色主题
+          colorPrimary: "#E6be5b", // 经典金色
+          colorPrimaryHover: "#D4AF37", // 明亮金色
+          colorPrimaryActive: "#996515", // 古铜金色
+        },
       }}
     >
       {children}
-      {/* <FloatMenuButton /> */}
+      <FloatMenuButton />
     </ConfigProvider>
   );
 }
