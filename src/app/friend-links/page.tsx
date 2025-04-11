@@ -10,13 +10,13 @@ const { Title, Link } = Typography;
 
 const links = [
   {
-    title: "P5合成范式",
-    description: "B站P5R Wiki的P5R合成范式详细说明",
+    title: "P5R合成范式",
+    description: "B站Wiki P5R 合成范式详细说明",
     url: "https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F",
   },
   {
-    title: "P5技能列表",
-    description: "B站Wiki的P5R技能详细说明",
+    title: "P5R技能列表",
+    description: "B站Wiki P5R 技能详细说明",
     url: "https://wiki.biligame.com/persona/P5R%E6%8A%80%E8%83%BD%E5%88%97%E8%A1%A8",
   },
   {
