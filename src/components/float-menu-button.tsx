@@ -1,8 +1,8 @@
 "use client";
 
 import { FloatButton } from "antd";
-import { MenuOutlined, HomeOutlined, GithubOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { MenuOutlined, GithubOutlined } from "@ant-design/icons";
+import { ReactNode, useState } from "react";
 
 const LinkFloatButton = ({
   icon,
@@ -25,7 +25,11 @@ const LinkFloatButton = ({
   );
 };
 
-const FloatMenuButton = () => {
+const FloatMenuButton = (props: {
+  extraBtns?: { icon: ReactNode; href: string }[];
+}) => {
+  const { extraBtns } = props;
+
   const [open, setOpen] = useState(false);
 
   return (
@@ -37,13 +41,11 @@ const FloatMenuButton = () => {
       open={open}
       onOpenChange={setOpen}
     >
-      {/* <LinkFloatButton
-        icon={<HomeOutlined />}
-        href="/"
-        onClick={() => {
-          // 处理导航
-        }}
-      /> */}
+      {extraBtns?.map((item) => {
+        return (
+          <LinkFloatButton key={item.href} icon={item.icon} href={item.href} />
+        );
+      })}
       <LinkFloatButton
         icon={<GithubOutlined />}
         href="https://github.com/2333Ge/persona-tools"

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/utils/style";
 import { BASE_PATH } from "@/utils/config";
+import GlobalLayout from "@/components/global-layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +33,7 @@ export default function RootLayout({
               className="w-full h-auto object-contain opacity-80"
             />
           </div>
-          {children}
+          <GlobalLayout>{children}</GlobalLayout>
         </main>
       </body>
     </html>

@@ -42,7 +42,7 @@
 
 ## 宝魔升降级计算
 
-原理可见[此up专栏](https://www.bilibili.com/opus/722047078518226960)
+原理可见[B站：蒙奇·D·瓦西里](https://www.bilibili.com/opus/722047078518226960)
 
 ## 参考资料
 

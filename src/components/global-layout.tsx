@@ -1,6 +1,5 @@
 "use client";
 
-import FloatMenuButton from "@/components/float-button";
 import { ConfigProvider, theme } from "antd";
 import { useEffect, useState } from "react";
 
@@ -35,7 +34,6 @@ export default function RootLayout({
       }}
     >
       {children}
-      <FloatMenuButton />
     </ConfigProvider>
   );
 }
