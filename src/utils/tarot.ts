@@ -2,8 +2,6 @@ import {
   ARCANA_LIST,
   CUSTOM_ARCANA_LIST,
   FUSION_TABLE,
-  SPECIAL_ARCANA_LIST,
-  SPECIAL_LEVEL_CHANGE_TABLE,
 } from "@/constant/tarot";
 import { FusionPath, FusionStep, ITarot } from "@/types/tarot";
 import { randomSelect } from "./data-handle";

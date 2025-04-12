@@ -155,6 +155,7 @@ export default function Fusion({ className }: FusionProps) {
                             : "text-red-600"
                         }
                       >
+                        {result.specialChange > 0 ? "+" : ""}
                         {result.specialChange}
                       </span>
                     </Descriptions.Item>
