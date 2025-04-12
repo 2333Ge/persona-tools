@@ -1,6 +1,7 @@
-import { ITArot } from "@/types/tarot";
+import { ITarot, ITArotType } from "@/types/tarot";
+import ALL_ARCANA_LIST from "./arcana.json";
 
-export const ARCANA_LIST: ITArot[] = [
+export const ARCANA_LIST: ITArotType[] = [
   { type: 0, name: "愚者" },
   { type: 1, name: "魔术师" },
   { type: 2, name: "女教皇" },
@@ -26,7 +27,7 @@ export const ARCANA_LIST: ITArot[] = [
   { type: 22, name: "顾问官" },
 ];
 
-export const SPECIAL_ARCANA_LIST: ITArot[] = [
+export const SPECIAL_ARCANA_LIST: ITArotType[] = [
   { type: 101, name: "摄政王" },
   { type: 102, name: "王后的项链" },
   { type: 103, name: "命运之石" },
@@ -185,3 +186,16 @@ export const SPECIAL_LEVEL_CHANGE_TABLE: number[][] = [
     -1, +1, +1, +2, +1,
   ],
 ];
+
+export const CUSTOM_ARCANA_LIST: Map<string, ITarot[]> = new Map();
+
+ALL_ARCANA_LIST.forEach((item) => {
+  const [name, typeName, level] = item;
+  const list = CUSTOM_ARCANA_LIST.get(typeName) || [];
+  list.push({
+    typeName,
+    name,
+    level,
+  });
+  CUSTOM_ARCANA_LIST.set(typeName, list);
+});
