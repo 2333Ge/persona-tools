@@ -11,7 +11,7 @@ export const ARCANA_LIST: ITArotType[] = [
   { type: 6, name: "恋爱" },
   { type: 7, name: "战车" },
   { type: 8, name: "正义" },
-  { type: 9, name: "隐士" },
+  { type: 9, name: "隐者" },
   { type: 10, name: "命运" },
   { type: 11, name: "力量" },
   { type: 12, name: "倒悬者" },

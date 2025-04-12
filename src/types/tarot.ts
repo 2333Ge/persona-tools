@@ -4,14 +4,15 @@ export type ITArotType = {
 };
 
 export interface FusionStep {
-  material1: number;
-  material2: number;
-  result: number;
+  material1: ITarot;
+  material2: ITarot;
+  result: ITarot;
 }
 
 export interface FusionPath {
   steps: FusionStep[];
-  extraMaterials: number[];
+  extraMaterials: ITarot[];
+  specialChange?: number; // 特殊arcana的type
 }
 
 export interface LevelResult {

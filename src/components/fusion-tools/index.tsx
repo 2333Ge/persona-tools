@@ -9,6 +9,8 @@ import { cn } from "@/utils/style";
 import FusionItem from "./FusionItem";
 
 const arcanaTypes = Array.from(CUSTOM_ARCANA_LIST.keys());
+const formatArcana = (arcana: ITarot) =>
+  `${arcana.name}Lv.${arcana.level} (${arcana.typeName})`;
 
 type FusionProps = {
   className?: string;
@@ -25,18 +27,15 @@ export default function Fusion({ className }: FusionProps) {
     EMPTY_TAROT,
   ]);
   const [targetPersona, setTargetPersona] = useState<ITarot>(EMPTY_TAROT);
-  const [currentType, setCurrentType] = useState<string>();
-  // const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
+  const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
 
   const isNotChoose = !targetPersona || selectedMaterials.length < 1;
 
   const handleConfirm = () => {
     if (isNotChoose) return;
 
-    const materialTypes = selectedMaterials.map((m) => Number(m.typeName));
-    const targetType = Number(targetPersona.typeName);
-    // const paths = findFusionPaths(materialTypes, targetType);
-    // setFusionResults(paths);
+    const paths = findFusionPaths(selectedMaterials, targetPersona);
+    setFusionResults(paths);
   };
 
   return (
@@ -107,7 +106,7 @@ export default function Fusion({ className }: FusionProps) {
         </div>
       </Card>
 
-      {/* <Card title="合成路径" className="w-full">
+      <Card title="合成路径" className="w-full">
         {fusionResults?.length > 0 ? (
           <div className="flex flex-col gap-4">
             {fusionResults.map((result, index) => (
@@ -116,9 +115,9 @@ export default function Fusion({ className }: FusionProps) {
                   {result.steps.map((step, stepIndex) => {
                     return (
                       <div key={stepIndex}>
-                        步骤 {stepIndex + 1}: {getArcanaName(step.material1)} +{" "}
-                        {getArcanaName(step.material2)} ={" "}
-                        {getArcanaName(step.result)}
+                        步骤 {stepIndex + 1}: {formatArcana(step.material1)} +{" "}
+                        {formatArcana(step.material2)} ={" "}
+                        {formatArcana(step.result)}
                       </div>
                     );
                   })}
@@ -126,12 +125,22 @@ export default function Fusion({ className }: FusionProps) {
                     <div className="mt-2">
                       额外材料:{" "}
                       {result.extraMaterials
-                        .map(
-                          (type) =>
-                            ARCANA_LIST.find((item) => item.type === type)
-                              ?.name || type
-                        )
+                        .map((material) => formatArcana(material))
                         .join(", ")}
+                    </div>
+                  )}
+                  {!!result.specialChange && (
+                    <div className="mt-2">
+                      宝魔升降:{" "}
+                      <span
+                        className={
+                          result.specialChange > 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }
+                      >
+                        {result.specialChange}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -141,7 +150,7 @@ export default function Fusion({ className }: FusionProps) {
         ) : (
           <Empty description="暂无合成路径" />
         )}
-      </Card> */}
+      </Card>
     </div>
   );
 }
