@@ -183,9 +183,15 @@ function getTypeByTypeName(typeName: string): number {
   return arcana ? arcana.type : -1;
 }
 
-function getNearbyPersona(type: number, targetLevel: number): ITarot {
+function getNearbyPersona(
+  type: number,
+  targetLevel: number,
+  lastResultLevel: number
+): ITarot {
   const arcana = ARCANA_LIST.find((item) => item.type === type);
   if (!arcana) throw new Error("Invalid type");
+
+  const materialLevel = Math.floor(targetLevel - 1) * 2 - lastResultLevel; // 计算目标等级
 
   const personas = CUSTOM_ARCANA_LIST.get(arcana.name);
   if (!personas || personas.length === 0) throw new Error("No persona found");
@@ -194,7 +200,9 @@ function getNearbyPersona(type: number, targetLevel: number): ITarot {
     (a, b) => Number(a.level) - Number(b.level)
   );
 
-  const index = sortedPersonas.findIndex((p) => Number(p.level) >= targetLevel);
+  const index = sortedPersonas.findIndex(
+    (p) => Number(p.level) >= materialLevel
+  );
 
   if (index === -1) {
     // 如果所有素材等级都小于目标等级，返回最高等级的
@@ -210,8 +218,8 @@ function getNearbyPersona(type: number, targetLevel: number): ITarot {
   const prev = sortedPersonas[index - 1];
   const curr = sortedPersonas[index];
 
-  const prevDiff = Math.abs(Number(prev.level) - targetLevel);
-  const currDiff = Math.abs(Number(curr.level) - targetLevel);
+  const prevDiff = Math.abs(Number(prev.level) - materialLevel);
+  const currDiff = Math.abs(Number(curr.level) - materialLevel);
 
   return prevDiff <= currDiff ? prev : curr;
 }
@@ -265,7 +273,8 @@ export function findFusionPaths(
       for (const extra of possibleExtraTypes) {
         const material2 = getNearbyPersona(
           extra,
-          Number(lastResult.level) - 10
+          Number(target.level),
+          Number(lastResult.level)
         );
         const result = getFusionResult(lastResult, material2);
         if (!result) continue;
@@ -301,7 +310,8 @@ export function findFusionPaths(
     for (const extra of possibleExtraTypes) {
       const extraPersona = getNearbyPersona(
         extra,
-        Number(lastResult.level) - 10 // 合成等级一般比最终高，这里降点
+        Number(target.level),
+        Number(lastResult.level)
       );
       const result = getFusionResult(lastResult, extraPersona);
       if (!result) continue;

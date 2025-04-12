@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Empty, Row, Select, Button } from "antd";
+import { Card, Empty, Row, Select, Button, Descriptions } from "antd";
 import { ARCANA_LIST, CUSTOM_ARCANA_LIST } from "@/constant/tarot";
 import { findFusionPaths, getArcanaName } from "@/utils/tarot";
 import { FusionPath, ITarot } from "@/types/tarot";
@@ -121,30 +121,33 @@ export default function Fusion({ className }: FusionProps) {
           <div className="flex flex-col gap-4">
             {fusionResults.map((result, index) => (
               <Card key={index} type="inner" title={`方案 ${index + 1}`}>
-                <div className="whitespace-pre-wrap">
-                  {result.steps.map((step, stepIndex) => {
-                    return (
-                      <div key={stepIndex}>
-                        步骤 {stepIndex + 1}: {formatArcana(step.material1)} +{" "}
+                <Descriptions column={1}>
+                  {result.steps.map((step, stepIndex) => (
+                    <Descriptions.Item
+                      key={stepIndex}
+                      label={`步骤 ${stepIndex + 1}`}
+                    >
+                      <div>
+                        {formatArcana(step.material1)} +{" "}
                         {formatArcana(step.material2)} ={" "}
                         {formatArcana(step.result)}
                       </div>
-                    );
-                  })}
+                    </Descriptions.Item>
+                  ))}
                   {result.extraMaterials.length > 0 && (
-                    <div className="mt-2">
-                      额外材料:{" "}
-                      {result.extraMaterials.map((material, index) => (
-                        <span key={index}>
-                          {formatArcana(material)}
-                          {index < result.extraMaterials.length - 1 && "、"}
-                        </span>
-                      ))}
-                    </div>
+                    <Descriptions.Item label="额外材料">
+                      <div>
+                        {result.extraMaterials.map((material, index) => (
+                          <span key={index}>
+                            {formatArcana(material)}
+                            {index < result.extraMaterials.length - 1 && "、"}
+                          </span>
+                        ))}
+                      </div>
+                    </Descriptions.Item>
                   )}
                   {!!result.specialChange && (
-                    <div className="mt-2">
-                      宝魔升降:{" "}
+                    <Descriptions.Item label="宝魔升降">
                       <span
                         className={
                           result.specialChange > 0
@@ -154,9 +157,9 @@ export default function Fusion({ className }: FusionProps) {
                       >
                         {result.specialChange}
                       </span>
-                    </div>
+                    </Descriptions.Item>
                   )}
-                </div>
+                </Descriptions>
               </Card>
             ))}
           </div>

@@ -53,5 +53,5 @@
 ## 其他可用资料
 
 - [P5技能列表](https://wiki.biligame.com/persona/P5R%E6%8A%80%E8%83%BD%E5%88%97%E8%A1%A8)
-- [面具合成与宝魔升降法](https://www.bilibili.com/opus/722047078518226960)
+- [面具合成与宝魔升降法教程](https://www.bilibili.com/opus/722047078518226960)
 - [社区工具](https://zonizuka.github.io/p5r-fusion)

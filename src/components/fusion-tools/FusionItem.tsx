@@ -37,7 +37,7 @@ export default function FusionItem({
         className="flex-1"
       />
       <Select
-        placeholder="请选择具体 Persona"
+        placeholder="请选择具体面具"
         value={material.name}
         onChange={(selected) => {
           onMaterialChange({
