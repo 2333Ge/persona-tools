@@ -335,7 +335,10 @@ export function findFusionPaths(
     if (rest.length === 1) {
       const lastResult = rest[0];
 
-      if (lastResult.typeName === target.typeName) {
+      if (
+        lastResult.name === target.name &&
+        lastResult.level === target.level
+      ) {
         addValidPath(results, currentSteps, usedMaterials);
         return;
       }

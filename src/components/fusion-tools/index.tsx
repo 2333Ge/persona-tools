@@ -9,8 +9,14 @@ import { cn } from "@/utils/style";
 import FusionItem from "./FusionItem";
 
 const arcanaTypes = Array.from(CUSTOM_ARCANA_LIST.keys());
-const formatArcana = (arcana: ITarot) =>
-  `${arcana.name}Lv.${arcana.level} (${arcana.typeName})`;
+const formatArcana = (arcana: ITarot) => (
+  <>
+    {arcana.name}
+    <span className="text-gray-500 text-xs">
+      ({arcana.typeName}Lv.{arcana.level})
+    </span>
+  </>
+);
 
 type FusionProps = {
   className?: string;
@@ -29,7 +35,11 @@ export default function Fusion({ className }: FusionProps) {
   const [targetPersona, setTargetPersona] = useState<ITarot>(EMPTY_TAROT);
   const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
 
-  const isNotChoose = !targetPersona || selectedMaterials.length < 1;
+  const isNotChoose =
+    !targetPersona ||
+    selectedMaterials.length < 1 ||
+    selectedMaterials.some((item) => !item.name) ||
+    !targetPersona.name;
 
   const handleConfirm = () => {
     if (isNotChoose) return;
@@ -67,7 +77,7 @@ export default function Fusion({ className }: FusionProps) {
                     newMaterials.splice(index, 1);
                     setSelectedMaterials(newMaterials);
                   }}
-                  showDelete={selectedMaterials.length > 0}
+                  showDelete={selectedMaterials.length > 1}
                 />
               );
             })}
@@ -124,9 +134,12 @@ export default function Fusion({ className }: FusionProps) {
                   {result.extraMaterials.length > 0 && (
                     <div className="mt-2">
                       额外材料:{" "}
-                      {result.extraMaterials
-                        .map((material) => formatArcana(material))
-                        .join(", ")}
+                      {result.extraMaterials.map((material, index) => (
+                        <span key={index}>
+                          {formatArcana(material)}
+                          {index < result.extraMaterials.length - 1 && "、"}
+                        </span>
+                      ))}
                     </div>
                   )}
                   {!!result.specialChange && (
