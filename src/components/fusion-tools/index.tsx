@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Empty, Row, Select, Button, Descriptions } from "antd";
-import { ARCANA_LIST, CUSTOM_ARCANA_LIST } from "@/constant/tarot";
-import { findFusionPaths, getArcanaName } from "@/utils/tarot";
+import { Card, Empty, Button, Descriptions } from "antd";
+import { CUSTOM_ARCANA_LIST } from "@/constant/tarot";
+import { findFusionPaths } from "@/utils/fusion";
 import { FusionPath, ITarot } from "@/types/tarot";
 import { cn } from "@/utils/style";
 import FusionItem from "./FusionItem";
