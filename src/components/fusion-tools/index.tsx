@@ -23,21 +23,18 @@ type FusionProps = {
 };
 
 const EMPTY_TAROT: ITarot = {
-  typeName: "愚者",
-  name: "亚森",
-  level: "1",
+  typeName: "月",
+  name: "辉夜·贼神",
+  level: "25",
 };
 
 export default function Fusion({ className }: FusionProps) {
-  const [selectedMaterials, setSelectedMaterials] = useState<ITarot[]>([
-    EMPTY_TAROT,
-  ]);
+  const [selectedMaterials, setSelectedMaterials] = useState<ITarot[]>([]);
   const [targetPersona, setTargetPersona] = useState<ITarot>(EMPTY_TAROT);
   const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
 
   const isNotChoose =
     !targetPersona ||
-    selectedMaterials.length < 1 ||
     selectedMaterials.some((item) => !item.name) ||
     !targetPersona.name;
 
@@ -58,7 +55,7 @@ export default function Fusion({ className }: FusionProps) {
       <Card title="二体处刑（合成）计算器" className="w-full">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label>选择基础素材（1-6个）：</label>
+            <label>选择基础素材（0-6个）：</label>
             {selectedMaterials.map((item, index) => {
               return (
                 <FusionItem
@@ -77,7 +74,7 @@ export default function Fusion({ className }: FusionProps) {
                     newMaterials.splice(index, 1);
                     setSelectedMaterials(newMaterials);
                   }}
-                  showDelete={selectedMaterials.length > 1}
+                  showDelete
                 />
               );
             })}
@@ -85,7 +82,10 @@ export default function Fusion({ className }: FusionProps) {
               <Button
                 type="dashed"
                 onClick={() => {
-                  setSelectedMaterials((prev) => [...prev, EMPTY_TAROT]);
+                  setSelectedMaterials((prev) => [
+                    ...prev,
+                    { typeName: "愚者", name: "", level: "" },
+                  ]);
                 }}
               >
                 添加素材

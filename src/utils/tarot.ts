@@ -102,6 +102,7 @@ export function getFusionResult(
   // 2. 计算最终的类型
   const resultType = getFusionResultByType(type1, type2);
   if (resultType === -1) return null; // 无法合成
+  if (material1.name === material2.name) return null; // 同素材无法合成
 
   // 3. 计算临时等级
   const tempLevel = calculateTempLevel(material1.level, material2.level);
@@ -361,8 +362,14 @@ export function findFusionPaths(
     tryPairFusions(rest, currentSteps, usedMaterials, dfs);
   };
 
-  // 开始搜索
-  dfs(materials, [], new Set());
+  if (materials.length) {
+    // 开始搜索
+    dfs(materials, [], new Set());
+  } else {
+    // 无初始素材时使用基础二体合成
+    results.push(...findBasicFusions(target));
+  }
+
   return results.sort(
     (a, b) => a.extraMaterials.length - b.extraMaterials.length
   );
@@ -449,4 +456,92 @@ function tryPairFusions(
 export function getArcanaName(type: number): string {
   const arcana = ARCANA_LIST.find((item) => item.type === type);
   return arcana ? arcana.name : "未知";
+}
+
+/**
+ * 查找基础的二体合成路径（无初始素材）
+ */
+function findBasicFusions(target: ITarot): FusionPath[] {
+  const allResults: (FusionPath & { score: number })[] = [];
+  const targetType = getTypeByTypeName(target.typeName);
+  const targetLevel = Number(target.level);
+
+  // 1. 找出所有可能的合成类型对，避免重复组合
+  const possiblePairs: [number, number][] = [];
+  ARCANA_LIST.forEach((type1, i) => {
+    ARCANA_LIST.forEach((type2, j) => {
+      // 只处理 i <= j 的情况，避免重复
+      if (i <= j && getFusionResultByType(type1.type, type2.type) === targetType) {
+        possiblePairs.push([type1.type, type2.type]);
+      }
+    });
+  });
+
+  // 2. 收集所有可能的合成组合
+  for (const [type1, type2] of possiblePairs) {
+    const personas1 = CUSTOM_ARCANA_LIST.get(getArcanaName(type1)) || [];
+    const personas2 = CUSTOM_ARCANA_LIST.get(getArcanaName(type2)) || [];
+
+    for (const p1 of personas1) {
+      for (const p2 of personas2) {
+        // 同类型时只处理一种顺序
+        if (type1 === type2 && p1.name > p2.name) continue;
+        
+        const result = getFusionResult(p1, p2);
+        if (result && result.name === target.name) {
+          allResults.push({
+            steps: [
+              {
+                material1: p1,
+                material2: p2,
+                result: target,
+              },
+            ],
+            extraMaterials: [],
+            score: calculateScore(p1, p2, target),
+          });
+        }
+      }
+    }
+  }
+
+  // 3. 根据优先级排序
+  const sortedResults = allResults.sort((a, b) => b.score - a.score);
+
+  return sortedResults.slice(0, MAX_RESULTS);
+}
+
+/**
+ * 计算合成组合的得分
+ * 分数越高优先级越高
+ */
+function calculateScore(p1: ITarot, p2: ITarot, target: ITarot): number {
+  const isDifferentType = p1.typeName !== p2.typeName;
+  const targetLevel = Number(target.level);
+  const p1Level = Number(p1.level);
+  const p2Level = Number(p2.level);
+  const bothLowerLevel = p1Level < targetLevel && p2Level < targetLevel;
+
+  // 优先级评分
+  let score = 0;
+
+  // 最优先：不同类型且都低于目标等级
+  if (isDifferentType && bothLowerLevel) {
+    score += 1000;
+  }
+  // 其次：不同类型
+  else if (isDifferentType) {
+    score += 500;
+  }
+  // 最后：相同类型
+  else {
+    score += 100;
+  }
+
+  // 在同一优先级内，等级差距越小越好
+  const levelDiff =
+    Math.abs(p1Level - targetLevel) + Math.abs(p2Level - targetLevel);
+  score -= levelDiff;
+
+  return score;
 }
