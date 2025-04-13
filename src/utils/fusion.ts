@@ -78,7 +78,7 @@ export function findFusionPaths(
       for (const extra of possibleExtraTypes) {
         const material2 = getNearbyPersona(
           extra,
-          Number(target.level),
+          Math.max(Number(target.level) - 20, 1),
           Number(lastResult.level)
         );
         const result = getFusionResult(lastResult, material2);
@@ -115,7 +115,7 @@ export function findFusionPaths(
     for (const extra of possibleExtraTypes) {
       const extraPersona = getNearbyPersona(
         extra,
-        Number(target.level),
+        Math.max(Number(target.level) - 25, 1),
         Number(lastResult.level)
       );
       const result = getFusionResult(lastResult, extraPersona);
