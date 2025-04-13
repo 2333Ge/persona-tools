@@ -22,24 +22,40 @@ type FusionProps = {
   className?: string;
 };
 
-const EMPTY_TAROT: ITarot = {
+const DEFAULT_TARGET_TAROT: ITarot = {
   typeName: "月",
   name: "辉夜·贼神",
   level: "25",
 };
 
+const EMPTY_TAROT: ITarot = {
+  typeName: "愚者",
+  name: "",
+  level: "",
+};
+
 export default function Fusion({ className }: FusionProps) {
   const [selectedMaterials, setSelectedMaterials] = useState<ITarot[]>([]);
-  const [targetPersona, setTargetPersona] = useState<ITarot>(EMPTY_TAROT);
+  const [targetPersona, setTargetPersona] = useState<ITarot | null>(null);
   const [fusionResults, setFusionResults] = useState<FusionPath[]>([]);
 
-  const isNotChoose =
-    !targetPersona ||
-    selectedMaterials.some((item) => !item.name) ||
-    !targetPersona.name;
+  const isDirectFusion =
+    selectedMaterials.length >= 2 &&
+    selectedMaterials.length <= 6 &&
+    !selectedMaterials.some((item) => !item.name) &&
+    !targetPersona;
+  const isFusionTargetPath =
+    selectedMaterials.length > 0 &&
+    !!targetPersona &&
+    !selectedMaterials.some((item) => !item.name) &&
+    targetPersona?.name &&
+    selectedMaterials.length <= 6;
+  const isFusionTarget = !selectedMaterials.length && !!targetPersona?.name;
+
+  const isValidInput = isDirectFusion || isFusionTarget || isFusionTargetPath;
 
   const handleConfirm = () => {
-    if (isNotChoose) return;
+    if (!isValidInput) return;
 
     const paths = findFusionPaths(selectedMaterials, targetPersona);
     setFusionResults(paths);
@@ -82,10 +98,7 @@ export default function Fusion({ className }: FusionProps) {
               <Button
                 type="dashed"
                 onClick={() => {
-                  setSelectedMaterials((prev) => [
-                    ...prev,
-                    { typeName: "愚者", name: "", level: "" },
-                  ]);
+                  setSelectedMaterials((prev) => [...prev, EMPTY_TAROT]);
                 }}
               >
                 添加素材
@@ -95,23 +108,37 @@ export default function Fusion({ className }: FusionProps) {
 
           <div className="flex flex-col gap-2">
             <label>选择目标结果：</label>
-            <FusionItem
-              material={targetPersona}
-              arcanaTypes={arcanaTypes}
-              onMaterialChange={(material) => {
-                setTargetPersona(material);
-              }}
-              showDelete={false}
-            />
+            {!targetPersona ? (
+              <Button
+                type="dashed"
+                onClick={() => {
+                  setTargetPersona(EMPTY_TAROT);
+                }}
+              >
+                添加目标结果
+              </Button>
+            ) : (
+              <FusionItem
+                material={targetPersona}
+                arcanaTypes={arcanaTypes}
+                onMaterialChange={(material) => {
+                  setTargetPersona(material);
+                }}
+                onDelete={() => {
+                  setTargetPersona(null);
+                }}
+                showDelete
+              />
+            )}
           </div>
 
           <Button
             type="primary"
             onClick={handleConfirm}
-            disabled={isNotChoose || selectedMaterials.length > 5}
+            disabled={!isValidInput}
             className="mt-4"
           >
-            计算合成路径
+            {isDirectFusion ? "直接合成" : "计算合成路径"}
           </Button>
         </div>
       </Card>

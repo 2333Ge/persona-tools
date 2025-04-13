@@ -10,7 +10,7 @@ import {
   getFusionResultByType,
   getTypeByTypeName,
   getFusionResult,
-  getSpecialLevelChange, 
+  getSpecialLevelChange,
 } from "./tarot";
 
 // 常量配置
@@ -24,9 +24,19 @@ const MAX_RANDOM_EXTRAS = 3;
  */
 export function findFusionPaths(
   materials: ITarot[],
-  target: ITarot
+  target: ITarot | null
 ): FusionPath[] {
   const results: FusionPath[] = [];
+
+  if (!target) {
+    const paths = tryDirectFusions(materials);
+    return paths;
+  }
+
+  if (!materials.length && target) {
+    // 无初始素材时尝试基础二体合成
+    results.push(...findBasicFusions(target));
+  }
 
   // 处理直接合成到目标的情况
   const handleDirectFusion = (
@@ -158,14 +168,7 @@ export function findFusionPaths(
     tryPairFusions(rest, currentSteps, usedMaterials, dfs);
   };
 
-  if (materials.length) {
-    // 开始搜索
-    dfs(materials, [], new Set());
-  } 
-  else {
-    // 无初始素材时使用基础二体合成
-    results.push(...findBasicFusions(target));
-  }
+  dfs(materials, [], new Set());
 
   return results.sort(
     (a, b) => a.extraMaterials.length - b.extraMaterials.length
@@ -424,4 +427,63 @@ function calculateScore(p1: ITarot, p2: ITarot, target: ITarot): number {
   score -= levelDiff;
 
   return score;
+}
+
+/**
+ * 直接合成当前素材
+ */
+function tryDirectFusions(materials: ITarot[]): FusionPath[] {
+  const results: FusionPath[] = [];
+
+  // 保存所有合成步骤
+  const tryFusion = (
+    currentMaterials: ITarot[],
+    currentSteps: FusionStep[]
+  ) => {
+    // 如果只剩一个素材，就完成了一条路径
+    if (currentMaterials.length === 1) {
+      results.push({
+        steps: currentSteps,
+        extraMaterials: [],
+      });
+      return;
+    }
+
+    // 尝试所有可能的两两组合
+    for (let i = 0; i < currentMaterials.length - 1; i++) {
+      for (let j = i + 1; j < currentMaterials.length; j++) {
+        const result = getFusionResult(
+          currentMaterials[i],
+          currentMaterials[j]
+        );
+
+        if (!result) continue;
+
+        // 创建新的步骤
+        const newStep: FusionStep = {
+          material1: currentMaterials[i],
+          material2: currentMaterials[j],
+          result: result,
+        };
+
+        // 创建新的材料列表，移除用掉的两个，添加合成结果
+        const newMaterials = [
+          ...currentMaterials.slice(0, i),
+          ...currentMaterials.slice(i + 1, j),
+          ...currentMaterials.slice(j + 1),
+          result,
+        ];
+
+        // 继续尝试合成剩余的材料
+        tryFusion(newMaterials, [...currentSteps, newStep]);
+
+        if (results.length >= MAX_RESULTS) {
+          return;
+        }
+      }
+    }
+  };
+
+  tryFusion(materials, []);
+  return results;
 }
